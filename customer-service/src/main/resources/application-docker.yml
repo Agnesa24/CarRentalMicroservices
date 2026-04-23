@@ -1,0 +1,10 @@
+server:
+  port: 8080
+
+services:
+  rental:
+    base-url: http://rental-service:8080
+  billing:
+    base-url: http://billing-service:8080
+  vehicle:
+    base-url: http://vehicle-service:8080

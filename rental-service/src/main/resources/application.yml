@@ -1,0 +1,50 @@
+spring:
+  application:
+    name: rental-service
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  flyway:
+    enabled: true
+    # Only rental’s scripts; sibling modules on the classpath also ship db/migration and would clash (duplicate V1)
+    locations: classpath:db/migration/rental
+    baseline-on-migrate: true
+
+server:
+  port: 8085
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operationsSorter: method
+    tagsSorter: alpha
+
+logging:
+  level:
+    org.hibernate.SQL: debug
+    org.hibernate.type.descriptor.sql.BasicBinder: trace
+
+# HTTP integration is the default; start billing, customer, and vehicle before rental (or set gateway URLs)
+rental:
+  integration:
+    mode: http
+    http:
+      customerBaseUrl: http://localhost:8082/api/customers
+      vehicleBaseUrl: http://localhost:8083/api/vehicles
+      billingBaseUrl: http://localhost:8081/api/invoices
+
+services:
+  billing:
+    base-url: http://localhost:8081
+  customers:
+    base-url: http://localhost:8082
+  vehicle:
+    base-url: http://localhost:8083

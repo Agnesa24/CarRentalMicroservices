@@ -1,0 +1,12 @@
+{
+  "info": {
+    "name": "Car Rental (via api-gateway on :8080)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    { "name": "GET /api/vehicles", "request": { "method": "GET", "url": "http://localhost:8080/api/vehicles" } },
+    { "name": "GET /api/customers", "request": { "method": "GET", "url": "http://localhost:8080/api/customers" } },
+    { "name": "GET /api/invoices", "request": { "method": "GET", "url": "http://localhost:8080/api/invoices" } },
+    { "name": "GET /api/rentals (orchestration API)", "request": { "method": "GET", "url": "http://localhost:8080/api/rentals" } }
+  ]
+}

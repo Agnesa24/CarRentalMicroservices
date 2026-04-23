@@ -1,0 +1,143 @@
+# Same orchestration style as a multi-service repo (databases + apps + gateway), with your
+# service names. rental-service is the orchestration API and depends on the other backends.
+# Local host port mapping matches the defaults in each service’s application.yml (all containers use 8080).
+version: "3.9"
+
+services:
+  vehicle-db:
+    image: postgres:16
+    container_name: vehicle-db
+    environment:
+      POSTGRES_DB: vehicle_db
+      POSTGRES_USER: carrental
+      POSTGRES_PASSWORD: carrental
+    ports:
+      - "5432:5432"
+    volumes:
+      - vehicle_pg_data:/var/lib/postgresql
+
+  customer-db:
+    image: postgres:16
+    container_name: customer-db
+    environment:
+      POSTGRES_DB: customer_db
+      POSTGRES_USER: carrental
+      POSTGRES_PASSWORD: carrental
+    ports:
+      - "5433:5432"
+    volumes:
+      - customer_pg_data:/var/lib/postgresql
+
+  rental-db:
+    image: postgres:16
+    container_name: rental-db
+    environment:
+      POSTGRES_DB: rental_db
+      POSTGRES_USER: carrental
+      POSTGRES_PASSWORD: carrental
+    ports:
+      - "5434:5432"
+    volumes:
+      - rental_pg_data:/var/lib/postgresql
+
+  billing-db:
+    image: postgres:16
+    container_name: billing-db
+    environment:
+      POSTGRES_DB: billing_db
+      POSTGRES_USER: carrental
+      POSTGRES_PASSWORD: carrental
+    ports:
+      - "5435:5432"
+    volumes:
+      - billing_pg_data:/var/lib/postgresql
+
+  vehicle-service:
+    build: ./vehicle-service
+    container_name: vehicle-service
+    environment:
+      SPRING_PROFILES_ACTIVE: pg,docker
+      POSTGRES_HOST: vehicle-db
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: vehicle_db
+      POSTGRES_USER: carrental
+      POSTGRES_PASSWORD: carrental
+      SERVER_PORT: 8080
+    depends_on:
+      - vehicle-db
+    ports:
+      - "8083:8080"
+
+  customer-service:
+    build: ./customer-service
+    container_name: customer-service
+    environment:
+      SPRING_PROFILES_ACTIVE: pg,docker
+      POSTGRES_HOST: customer-db
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: customer_db
+      POSTGRES_USER: carrental
+      POSTGRES_PASSWORD: carrental
+      SERVER_PORT: 8080
+    depends_on:
+      - customer-db
+    ports:
+      - "8082:8080"
+
+  billing-service:
+    build: ./billing-service
+    container_name: billing-service
+    environment:
+      SPRING_PROFILES_ACTIVE: pg,docker
+      POSTGRES_HOST: billing-db
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: billing_db
+      POSTGRES_USER: carrental
+      POSTGRES_PASSWORD: carrental
+      SERVER_PORT: 8080
+    depends_on:
+      - billing-db
+    ports:
+      - "8081:8080"
+
+  # Orchestrates the other three backends (see rental-service/application-docker.yml: HTTP + profiles)
+  rental-service:
+    build:
+      context: .
+      dockerfile: rental-service/Dockerfile
+    container_name: rental-service
+    environment:
+      SPRING_PROFILES_ACTIVE: pg,docker
+      POSTGRES_HOST: rental-db
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: rental_db
+      POSTGRES_USER: carrental
+      POSTGRES_PASSWORD: carrental
+      SERVER_PORT: 8080
+    depends_on:
+      - vehicle-service
+      - customer-service
+      - billing-service
+      - rental-db
+    ports:
+      - "8085:8080"
+
+  api-gateway:
+    build: ./api-gateway
+    container_name: api-gateway
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SERVER_PORT: 8080
+    depends_on:
+      - vehicle-service
+      - customer-service
+      - billing-service
+      - rental-service
+    ports:
+      - "8080:8080"
+
+volumes:
+  vehicle_pg_data:
+  customer_pg_data:
+  rental_pg_data:
+  billing_pg_data:

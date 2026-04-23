@@ -1,0 +1,11 @@
+server:
+  port: 8080
+
+# Service discovery via Docker hostnames
+services:
+  rental:
+    base-url: http://rental-service:8080
+  customers:
+    base-url: http://customer-service:8080
+  billing:
+    base-url: http://billing-service:8080

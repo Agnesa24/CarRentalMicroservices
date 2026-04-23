@@ -1,0 +1,9 @@
+// Multi-module layout aligned with a typical Spring microservice repo: gateway, domain services,
+// and rental (orchestration) last — rental aggregates and coordinates vehicle, customer, and billing
+rootProject.name = 'CarRentalMicroservices'
+
+include 'api-gateway'
+include 'billing-service'
+include 'customer-service'
+include 'vehicle-service'
+include 'rental-service'

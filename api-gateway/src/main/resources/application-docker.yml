@@ -1,0 +1,28 @@
+# Inside Docker, each backend listens on port 8080; rental remains the route for orchestration
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      server:
+        webmvc:
+          routes:
+            - id: vehicle-service
+              uri: http://vehicle-service:8080
+              predicates:
+                - Path=/api/vehicles/**
+            - id: customer-service
+              uri: http://customer-service:8080
+              predicates:
+                - Path=/api/customers/**
+            - id: billing-service
+              uri: http://billing-service:8080
+              predicates:
+                - Path=/api/invoices/**
+            - id: rental-service
+              uri: http://rental-service:8080
+              predicates:
+                - Path=/api/rentals/**
+
+server:
+  port: 8080

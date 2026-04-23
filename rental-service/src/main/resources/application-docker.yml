@@ -1,0 +1,19 @@
+# In Docker, rental (orchestration) calls the other three services over HTTP
+server:
+  port: 8080
+
+rental:
+  integration:
+    mode: http
+    http:
+      customerBaseUrl: http://customer-service:8080/api/customers
+      vehicleBaseUrl: http://vehicle-service:8080/api/vehicles
+      billingBaseUrl: http://billing-service:8080/api/invoices
+
+services:
+  billing:
+    base-url: http://billing-service:8080
+  customers:
+    base-url: http://customer-service:8080
+  vehicle:
+    base-url: http://vehicle-service:8080
